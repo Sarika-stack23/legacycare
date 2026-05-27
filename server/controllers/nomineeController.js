@@ -1,4 +1,5 @@
 const Nominee = require("../models/Nominee");
+const FuneralPlan = require("../models/FuneralPlan");
 const crypto = require("crypto");
 
 // @desc    Add nominee
@@ -7,7 +8,6 @@ const crypto = require("crypto");
 const addNominee = async (req, res) => {
   try {
     const accessCode = crypto.randomBytes(6).toString("hex").toUpperCase();
-
     const nominee = await Nominee.create({
       ...req.body,
       user: req.user._id,
@@ -47,7 +47,15 @@ const nomineeAccess = async (req, res) => {
     nominee.hasAccess = true;
     await nominee.save();
 
-    res.json({ message: "Access granted", nominee });
+    // Fetch funeral plan of the user who owns this nominee
+    const plan = await FuneralPlan.findOne({ user: nominee.user })
+      .populate("selectedProviders.provider");
+
+    res.json({ 
+      message: "Access granted", 
+      nominee,
+      plan: plan || null
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -65,9 +73,11 @@ const updateNominee = async (req, res) => {
       return res.status(403).json({ message: "Not authorized" });
     }
 
-    const updated = await Nominee.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const updated = await Nominee.findByIdAndUpdate(
+      req.params.id, 
+      req.body, 
+      { new: true }
+    );
     res.json(updated);
   } catch (error) {
     res.status(500).json({ message: error.message });

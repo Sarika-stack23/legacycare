@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { nomineeService } from "../services/api";
-import Loader from "../components/Loader";
 
 const ViewPlan = () => {
   const [accessCode, setAccessCode] = useState("");
@@ -14,10 +13,10 @@ const ViewPlan = () => {
     setLoading(true);
     setError("");
     setPlan(null);
+    setNominee(null);
     try {
       const { data } = await nomineeService.nomineeAccess(accessCode);
       setNominee(data.nominee);
-      // After access granted fetch plan - backend returns nominee data
       setPlan(data.plan || null);
     } catch (err) {
       setError("❌ Invalid access code. Please try again.");
@@ -39,7 +38,6 @@ const ViewPlan = () => {
             <p className="text-slate-400 text-sm mb-6">
               Enter the access code shared with you to view the funeral plan
             </p>
-
             <form onSubmit={handleAccess} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-600 mb-1">
@@ -49,16 +47,14 @@ const ViewPlan = () => {
                   type="text"
                   value={accessCode}
                   onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
-                  placeholder="Enter 6-character code (e.g. A1B2C3)"
+                  placeholder="Enter code (e.g. A1B2C3)"
                   maxLength={12}
                   className="w-full border border-slate-300 rounded-lg px-4 py-3 font-mono text-lg tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-amber-400"
                 />
               </div>
-
               {error && (
                 <p className="text-red-500 text-sm text-center">{error}</p>
               )}
-
               <button
                 type="submit"
                 disabled={loading || !accessCode}
@@ -67,7 +63,6 @@ const ViewPlan = () => {
                 {loading ? "Verifying..." : "Access Plan"}
               </button>
             </form>
-
             <div className="mt-6 bg-slate-50 rounded-lg p-4 text-sm text-slate-500">
               <p className="font-medium text-slate-600 mb-1">📌 Note:</p>
               <p>
@@ -95,7 +90,7 @@ const ViewPlan = () => {
             {/* Nominee Info */}
             <div className="bg-white rounded-xl shadow p-6">
               <h3 className="font-bold text-slate-700 mb-4">
-                👤 Your Nominee Details
+                👤 Your Details
               </h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
@@ -134,7 +129,7 @@ const ViewPlan = () => {
                       <p className="font-medium text-slate-700">{plan.title}</p>
                     </div>
                     <div>
-                      <p className="text-slate-400">Preferred Location</p>
+                      <p className="text-slate-400">Location</p>
                       <p className="font-medium text-slate-700">
                         {plan.preferredLocation || "Not specified"}
                       </p>
@@ -165,6 +160,7 @@ const ViewPlan = () => {
                     </div>
                   </div>
 
+                  {/* Ceremony Instructions */}
                   {plan.ceremonyInstructions && (
                     <div className="bg-slate-50 rounded-lg p-4 space-y-2">
                       <h4 className="font-semibold text-slate-600">
@@ -196,6 +192,29 @@ const ViewPlan = () => {
                       )}
                     </div>
                   )}
+
+                  {/* Selected Providers */}
+                  {plan.selectedProviders && 
+                   plan.selectedProviders.length > 0 && (
+                    <div className="bg-amber-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-slate-600 mb-2">
+                        🤝 Selected Service Providers
+                      </h4>
+                      <div className="space-y-2">
+                        {plan.selectedProviders.map((sp, i) => (
+                          <div key={i}
+                            className="flex justify-between items-center bg-white rounded-lg px-3 py-2 text-sm">
+                            <span className="font-medium text-slate-700">
+                              ✅ {sp.provider?.businessName || "Provider"}
+                            </span>
+                            <span className="text-slate-400">
+                              📞 {sp.provider?.phone || ""}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
@@ -211,8 +230,7 @@ const ViewPlan = () => {
               <p className="font-medium mb-1">📞 Next Steps</p>
               <p>
                 Please contact the listed service providers and coordinate
-                arrangements as per the instructions above. Keep this page
-                accessible for reference.
+                arrangements as per the instructions above.
               </p>
             </div>
           </div>
