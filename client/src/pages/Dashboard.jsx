@@ -30,6 +30,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-5xl mx-auto">
+
         {/* Welcome */}
         <div className="bg-slate-800 text-white rounded-2xl p-6 mb-6">
           <h1 className="text-2xl font-bold text-amber-400">
@@ -42,10 +43,8 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Link
-            to="/create-plan"
-            className="bg-white rounded-xl shadow p-5 hover:shadow-md transition text-center"
-          >
+          <Link to="/create-plan"
+            className="bg-white rounded-xl shadow p-5 hover:shadow-md transition text-center">
             <div className="text-3xl mb-2">📋</div>
             <h3 className="font-semibold text-slate-700">
               {plan ? "Update My Plan" : "Create My Plan"}
@@ -53,19 +52,15 @@ const Dashboard = () => {
             <p className="text-xs text-slate-400 mt-1">Funeral preferences & instructions</p>
           </Link>
 
-          <Link
-            to="/providers"
-            className="bg-white rounded-xl shadow p-5 hover:shadow-md transition text-center"
-          >
+          <Link to="/providers"
+            className="bg-white rounded-xl shadow p-5 hover:shadow-md transition text-center">
             <div className="text-3xl mb-2">🤝</div>
             <h3 className="font-semibold text-slate-700">Service Providers</h3>
             <p className="text-xs text-slate-400 mt-1">Browse verified funeral services</p>
           </Link>
 
-          <Link
-            to="/nominee"
-            className="bg-white rounded-xl shadow p-5 hover:shadow-md transition text-center"
-          >
+          <Link to="/nominee"
+            className="bg-white rounded-xl shadow p-5 hover:shadow-md transition text-center">
             <div className="text-3xl mb-2">👨‍👩‍👧</div>
             <h3 className="font-semibold text-slate-700">
               {nominee ? "Update Nominee" : "Add Nominee"}
@@ -97,17 +92,41 @@ const Dashboard = () => {
               </div>
               <div>
                 <p className="text-slate-400">Budget Estimate</p>
-                <p className="font-medium text-slate-700">₹{plan.budgetEstimate?.toLocaleString()}</p>
+                <p className="font-medium text-amber-600">
+                  ₹{plan.budgetEstimate?.toLocaleString()}
+                </p>
               </div>
               <div>
                 <p className="text-slate-400">Status</p>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  plan.isFinalized ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+                  plan.isFinalized
+                    ? "bg-green-100 text-green-700"
+                    : "bg-amber-100 text-amber-700"
                 }`}>
                   {plan.isFinalized ? "Finalized" : "Draft"}
                 </span>
               </div>
             </div>
+
+            {/* Selected Providers */}
+            {plan.selectedProviders && plan.selectedProviders.length > 0 && (
+              <div className="mt-5 border-t border-slate-100 pt-4">
+                <p className="text-sm font-semibold text-slate-600 mb-3">
+                  🤝 Selected Service Providers ({plan.selectedProviders.length})
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {plan.selectedProviders.map((sp, i) => (
+                    <span
+                      key={i}
+                      className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-medium"
+                    >
+                      ✅ {sp.provider?.businessName || "Provider"}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <Link
               to="/create-plan"
               className="mt-4 inline-block bg-slate-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-900 transition"
@@ -130,7 +149,9 @@ const Dashboard = () => {
         {/* Nominee Summary */}
         {nominee && (
           <div className="bg-white rounded-xl shadow p-6">
-            <h2 className="text-lg font-bold text-slate-700 mb-4">👨‍👩‍👧 Assigned Nominee</h2>
+            <h2 className="text-lg font-bold text-slate-700 mb-4">
+              👨‍👩‍👧 Assigned Nominee
+            </h2>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-slate-400">Name</p>
@@ -146,11 +167,14 @@ const Dashboard = () => {
               </div>
               <div>
                 <p className="text-slate-400">Access Code</p>
-                <p className="font-mono font-bold text-amber-600">{nominee.accessCode}</p>
+                <p className="font-mono font-bold text-amber-600">
+                  {nominee.accessCode}
+                </p>
               </div>
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
